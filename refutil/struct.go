@@ -53,3 +53,9 @@ func (sr *StructRef) GetFieldValue(name string) any {
 func (sr *StructRef) SetFieldValue(name string, value any) {
 	sr.RefValue().FieldByName(name).Set(reflect.ValueOf(value))
 }
+
+func (sr *StructRef) IfSetFieldValue(name string, value any) {
+	if sr.ExistField(name) {
+		sr.RefValue().FieldByName(name).Set(reflect.ValueOf(value))
+	}
+}
