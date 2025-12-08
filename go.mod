@@ -1,9 +1,9 @@
 module github.com/miaoyin/go-kit
 
-go 1.23.10
+go 1.20
 
 require (
-	github.com/pelletier/go-toml/v2 v2.2.4
+	github.com/pelletier/go-toml/v2 v2.2.2
 	gopkg.in/yaml.v3 v3.0.1
 )
 
