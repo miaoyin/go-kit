@@ -2,18 +2,20 @@ package fileutil
 
 import (
 	"encoding/json"
-	"github.com/pelletier/go-toml/v2"
-	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
+    "strings"
+
+    "github.com/pelletier/go-toml/v2"
+	"gopkg.in/yaml.v3"
 )
 
-/*
-	viper: support map, not support list
-	encoding: supportmap, list
-*/
+// viper: support map, not support list
+// encoding: support map, list
 
-func FileUnmarshal(path string, v any) error{
+
+// FileUnmarshal 读文件并解码
+func FileUnmarshal(path string, v any) error {
 	dataBytes, err := os.ReadFile(path)
 	if err != nil {
 		return err
@@ -31,49 +33,44 @@ func FileUnmarshal(path string, v any) error{
 	}
 }
 
-func FileMarshal(path string, v any) (err error){
-	var dataBytes []byte
-	ext := filepath.Ext(path)
-	switch ext {
-	case ".yaml", ".yml":
-		dataBytes, err = yaml.Marshal(v)
-		if err != nil {
-			return err
-		}
-	case ".json":
-		dataBytes, err = json.Marshal(v)
-		if err != nil {
-			return err
-		}
-	case ".toml":
-		dataBytes, err = toml.Marshal(v)
-		if err != nil {
-			return err
-		}
-	default:
-		dataBytes, err = json.Marshal(v)
-		if err != nil {
-			return err
-		}
-	}
+// MarshalByExt 编码
+//    path 文件路径或者后缀
+//    v 数据对象
+func MarshalByExt(path string, v any) ([]byte, error) {
+    ext := strings.TrimLeft(filepath.Ext(path), ".")
+    switch ext {
+    case "yaml", "yml":
+        return yaml.Marshal(v)
+    case "json":
+        return json.Marshal(v)
+    case "toml":
+        return toml.Marshal(v)
+    default:
+        return json.Marshal(v)
+    }
+}
+
+// FileMarshal 编码并保存文件
+func FileMarshal(path string, v any) (err error) {
+    dataBytes, err := MarshalByExt(path, v)
 	return os.WriteFile(path, dataBytes, os.ModePerm)
 }
 
-func FileMarshalIndent(path string, v any) (err error){
+func FileMarshalIndent(path string, v any) (err error) {
 	var dataBytes []byte
-	ext := filepath.Ext(path)
+    ext := strings.TrimLeft(filepath.Ext(path), ".")
 	switch ext {
-	case ".yaml", ".yml":
+	case "yaml", "yml":
 		dataBytes, err = yaml.Marshal(v)
 		if err != nil {
 			return err
 		}
-	case ".json":
+	case "json":
 		dataBytes, err = json.MarshalIndent(v, "", "    ")
 		if err != nil {
 			return err
 		}
-	case ".toml":
+	case "toml":
 		dataBytes, err = toml.Marshal(v)
 		if err != nil {
 			return err
@@ -86,4 +83,3 @@ func FileMarshalIndent(path string, v any) (err error){
 	}
 	return os.WriteFile(path, dataBytes, os.ModePerm)
 }
-
