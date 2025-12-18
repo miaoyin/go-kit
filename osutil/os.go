@@ -4,15 +4,8 @@ import (
     "os"
 )
 
-/*---------------------------------
 
-osutil
-
----------------------------------*/
-
-func CurrentExePath() string{
-    //name = filepath.Base(xx)
-    //dir, name = filepath.Split(xx)
+func Executable() string{
     exePath, _ := os.Executable()
     return exePath
 }
@@ -33,14 +26,14 @@ func IsDir(dir string) bool {
     return f.IsDir()
 }
 
+// IsExist 是否存在, 返回bool
 func IsExist(path string) bool {
-    // 是否存在, 返回bool
     _, err := os.Stat(path)
     return err == nil || os.IsExist(err)
 }
 
+// IsExistE 是否存在, 返回error
 func IsExistE(path string) error {
-    //是否存在, 返回error
     _, err := os.Stat(path)
     if err ==nil || os.IsExist(err){
         return nil
