@@ -6,10 +6,11 @@ import (
 	"net/http"
 )
 
-
-func CreateResponse(requestFunc RequestFunc) *Response{
+func CreateResponse(requestDo RequestFunc) *Response{
+	resp, err := requestDo()
 	return &Response{
-		requestFunc: requestFunc,
+		Response: resp,
+		err: err,
 	}
 }
 
@@ -22,7 +23,6 @@ func ErrorResponse(err error) *Response{
 type Response struct{
 	*http.Response
 	// requestFunc 请求函数
-	requestFunc    RequestFunc
 	err error
 }
 
@@ -30,19 +30,8 @@ func (r *Response) Error() error{
 	return r.err
 }
 
-func (r *Response) DoRequest() *Response {
-	if r.err != nil {
-		return r
-	}
-	if r.Response ==nil{
-		r.Response, r.err = r.requestFunc()
-	}
-	return r
-}
-
 // ReadBody 读取body
 func (r *Response) ReadBody() ([]byte, error) {
-	r.DoRequest()
 	if r.err!=nil{
 		return nil, r.err
 	}
@@ -56,7 +45,7 @@ func (r *Response) ReadBody() ([]byte, error) {
 	return rawData, err
 }
 
-// UnmarshalBody 解析结果
+//UnmarshalBody 解析结果
 func (r *Response) UnmarshalBody(result any, unmarshaller Unmarshaller) *Response {
 	// 读取
 	dataBytes, err := r.ReadBody()
@@ -65,18 +54,15 @@ func (r *Response) UnmarshalBody(result any, unmarshaller Unmarshaller) *Respons
 		return r
 	}
 	//解析
-	if unmarshaller!=nil{
-		if err = unmarshaller(dataBytes, result);err!=nil{
-			r.err = fmt.Errorf("UnmarshalError error=%v, body=%s", err, string(dataBytes))
-			return r
-		}
+	if err = unmarshaller(dataBytes, result);err!=nil{
+		r.err = fmt.Errorf("UnmarshalError error=%v, body=%s", err, string(dataBytes))
+		return r
 	}
 	return r
 }
 
-// CheckStatusCode 校验code
+//CheckStatusCode 校验code
 func (r *Response) CheckStatusCode(code int) *Response{
-	r.DoRequest()
 	if r.err!=nil{
 		return r
 	}
