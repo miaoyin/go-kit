@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/miaoyin/go-kit/pkg/module"
+	"github.com/miaoyin/go-kit/module"
 	"github.com/robfig/cron/v3"
 	"golang.org/x/exp/maps"
 )
@@ -16,10 +16,10 @@ var _ module.Module[module.EmptyConfig] = &Crontab[module.EmptyConfig]{}
 
 func NewCrontab[T any](name string, initCfg T)*Crontab[T]{
 	c := Crontab[T]{
-		cron: cron.New(),
+		cron:       cron.New(),
 		BaseModule: module.NewBaseModule[T](name, initCfg),
-		nameIndex: make(map[string]*ManagedTask),
-		idIndex: make(map[int]*ManagedTask),
+		nameIndex:  make(map[string]*ManagedTask),
+		idIndex:    make(map[int]*ManagedTask),
 	}
 	_ = c.Start(nil)
 	return &c
