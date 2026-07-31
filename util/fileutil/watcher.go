@@ -17,7 +17,7 @@ type DirectoryWatcher struct{
     rmu sync.RWMutex
 }
 
-func NewDirectoryWatcher() *DirectoryWatcher{
+func NewDirectoryWatcher() *DirectoryWatcher {
     fsWatcher, _ := fsnotify.NewWatcher()
     b := &DirectoryWatcher{
         Watcher: fsWatcher,
@@ -53,7 +53,7 @@ func (b *DirectoryWatcher) broadcast(evt fsnotify.Event) {
     }
 }
 
-func (b *DirectoryWatcher) Subscribe() *Subscriber{
+func (b *DirectoryWatcher) Subscribe() *Subscriber {
     sub := &Subscriber{
         Event:   make(chan fsnotify.Event),
         Done: make(chan struct{}),

@@ -15,7 +15,7 @@ func NewTimeoutClient(timeout time.Duration) *Client {
 
 
 //DoRequest 执行请求
-func DoRequest(client *http.Client, method string, url string, options ...Option) *Response{
+func DoRequest(client *http.Client, method string, url string, options ...Option) *Response {
 	return CreateResponse(func() (*http.Response, error) {
 		opts := NewDefaultOptions()
 		for _, opt := range options {
@@ -34,7 +34,7 @@ func DoRequest(client *http.Client, method string, url string, options ...Option
 type Client struct{
 	*http.Client
 }
-func (c *Client) Get(url string, options ...Option) *Response{
+func (c *Client) Get(url string, options ...Option) *Response {
 	return DoRequest(c.Client, http.MethodGet, url, options...)
 }
 

@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func CreateResponse(requestDo RequestFunc) *Response{
+func CreateResponse(requestDo RequestFunc) *Response {
 	resp, err := requestDo()
 	return &Response{
 		Response: resp,
@@ -14,7 +14,7 @@ func CreateResponse(requestDo RequestFunc) *Response{
 	}
 }
 
-func ErrorResponse(err error) *Response{
+func ErrorResponse(err error) *Response {
 	return &Response{
 		err: err,
 	}
@@ -62,7 +62,7 @@ func (r *Response) UnmarshalBody(result any, unmarshaller Unmarshaller) *Respons
 }
 
 //CheckStatusCode 校验code
-func (r *Response) CheckStatusCode(code int) *Response{
+func (r *Response) CheckStatusCode(code int) *Response {
 	if r.err!=nil{
 		return r
 	}
@@ -72,7 +72,7 @@ func (r *Response) CheckStatusCode(code int) *Response{
 	return r
 }
 
-func (r *Response) CheckOK() *Response{
+func (r *Response) CheckOK() *Response {
 	return r.CheckStatusCode(http.StatusOK)
 }
 

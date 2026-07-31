@@ -11,7 +11,7 @@ type (
     Option func(p *Options) error
 )
 
-func NewDefaultOptions()Options{
+func NewDefaultOptions() Options {
     return Options{
         Context: context.Background(),
         Body: nil,
