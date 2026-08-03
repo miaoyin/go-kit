@@ -18,13 +18,27 @@ const (
 	StateClosed
 )
 
+func (s State) String() string {
+	switch s {
+	case StateInit:
+		return "init"
+	case StateRunning:
+		return "running"
+	case StateClosed:
+		return "closed"
+	default:
+		return "unknown"
+	}
+}
+
 // 标准错误
 var (
 	ErrAlreadyStarted = errors.New("module already started")
-	ErrNotStarted     = errors.New("module not started")
+	ErrNotRunning     = errors.New("module not running")
 	ErrAlreadyClosed  = errors.New("module already closed")
 	//ErrNeedRestart 字段不支持热更新时返回
 	ErrNeedRestart    = errors.New("config changed non-hot-reload field, need restart module")
+	ErrModuleDisabled = errors.New("module disabled by config")
 )
 
 //RawModule 通用模块接口

@@ -80,6 +80,13 @@ func (b *BaseModule[T]) DoClose() {
 	b.state = StateClosed
 }
 
+//DoInit close时执行,允许重启
+func (b *BaseModule[T]) DoInit() {
+	b.muState.Lock()
+	defer b.muState.Unlock()
+	b.state = StateInit
+}
+
 //CheckStart 是否可以start
 func (b *BaseModule[T]) CheckStart() error {
 	b.muState.RLock()
