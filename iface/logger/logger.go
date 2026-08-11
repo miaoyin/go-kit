@@ -12,13 +12,13 @@ type Logger interface {
 	Error(msg string, args ...any)
 }
 
-//nopLogger 空实现
-type nopLogger struct{}
+//NopLogger 空实现
+type NopLogger struct{}
 
-func (nopLogger) Debug(string, ...any) {}
-func (nopLogger) Info(string, ...any)  {}
-func (nopLogger) Warn(string, ...any)  {}
-func (nopLogger) Error(string, ...any) {}
+func (NopLogger) Debug(string, ...any) {}
+func (NopLogger) Info(string, ...any)  {}
+func (NopLogger) Warn(string, ...any)  {}
+func (NopLogger) Error(string, ...any) {}
 
 
 //----------------------------------
@@ -28,7 +28,7 @@ func (nopLogger) Error(string, ...any) {}
 //----------------------------------
 
 var (
-	globalLogger Logger = nopLogger{}
+	globalLogger Logger = NopLogger{}
 	mu     sync.RWMutex
 )
 
@@ -37,7 +37,7 @@ func SetLogger(l Logger) {
 	defer mu.Unlock()
 	if l == nil {
 		//关闭日志
-		globalLogger = nopLogger{}
+		globalLogger = NopLogger{}
 		return
 	}
 	globalLogger = l
