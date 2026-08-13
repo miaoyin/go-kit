@@ -41,11 +41,34 @@ var (
 	ErrModuleDisabled = errors.New("module disabled by config")
 )
 
-//RawModule 通用模块接口
-// 用于统一管理
-type RawModule interface {
+//Named 模块名
+type Named interface{
 	//Name 全局唯一标识
 	Name() string
+}
+
+//Dependent 依赖其它模块, 启动先后顺序
+type Dependent interface {
+	Deps() []string
+}
+
+//CanEnable 可开关
+type CanEnable interface {
+	Enabled() bool
+}
+
+//Requirable 必选模块
+type Requirable interface {
+	Required() bool
+}
+
+//Describable 附带描述信息
+type Describable interface {
+	Desc() string
+}
+
+
+type Lifecycle interface {
 	//Start 启动
 	// 1. ctx用于启动过程中的阻塞操作, 一次性ctx, 不要存在struct中
 	// 2. NewModule时已经初始过配置
@@ -61,13 +84,8 @@ type RawModule interface {
 	IsRunning() bool
 }
 
-//Module 专用模块管理
-// T是配置参数类型
-// T推荐用struct类型,避免用指针. 配置参数热更新,使用副本更安全
-type Module[T any] interface{
-	//RawModule 通用接口
-	RawModule
-
+//Configurable 可配置参数模块
+type Configurable[T any] interface {
 	//SetConfig 设置配置,运行时修改. 初始配置在New时传入
 	// 1. Init状态：更新待生效配置
 	// 2. Running状态：尝试热更新，存在不可热更字段返回 ErrNeedRestart
@@ -78,5 +96,23 @@ type Module[T any] interface{
 	// 1.参数*T不安全, 使用时先获取副本
 	// 2.int64是版本号, 区分参数是否修改
 	GetConfig() (*T, int64)
+}
+
+
+//RawModule 通用模块接口
+// 用于统一管理
+type RawModule interface {
+	Named
+	Lifecycle
+}
+
+//Module 专用模块管理
+// T是配置参数类型
+// T推荐用struct类型,避免用指针. 配置参数热更新,使用副本更安全
+type Module[T any] interface{
+	//RawModule 通用接口
+	RawModule
+	//Configurable 可配置
+	Configurable[T]
 }
 

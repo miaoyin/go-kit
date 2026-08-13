@@ -15,18 +15,18 @@ import (
 type Manager struct{
 	mu      sync.RWMutex
 	//ordered 保留注册顺序
-	ordered []RawModule
+	ordered []Named
 	//查找
-	index   map[string]RawModule
+	index   map[string]Named
 }
 
 func NewManager() *Manager {
 	return &Manager{
-		index: make(map[string]RawModule),
+		index: make(map[string]Named),
 	}
 }
 
-func (m *Manager) Register(mod RawModule) error {
+func (m *Manager) Register(mod Named) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -40,17 +40,17 @@ func (m *Manager) Register(mod RawModule) error {
 }
 
 // Get 根据名称获取模块
-func (m *Manager) Get(name string) RawModule {
+func (m *Manager) Get(name string) Named {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	return m.index[name]
 }
 
 // List 返回所有模块
-func (m *Manager) List() []RawModule {
+func (m *Manager) List() []Named {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	out := make([]RawModule, len(m.ordered))
+	out := make([]Named, len(m.ordered))
 	copy(out, m.ordered)
 	return out
 }
@@ -60,9 +60,18 @@ func (m *Manager) StartAll(ctx context.Context) error {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
-	started := make([]RawModule, 0, len(m.ordered))
+	started := make([]Lifecycle, 0, len(m.ordered))
 	for _, mod := range m.ordered {
-		if err := mod.Start(ctx); err != nil {
+		lifeMod, ok := mod.(Lifecycle)
+		if !ok {
+			continue
+		}
+		if err := lifeMod.Start(ctx); err != nil {
+			//可选模块
+			requiredMod, ok := mod.(Requirable)
+			if ok==false || requiredMod.Required()==false{
+				continue
+			}
 			// 回滚
 			closeCtx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 			for i := len(started) - 1; i >= 0; i-- {
@@ -70,7 +79,7 @@ func (m *Manager) StartAll(ctx context.Context) error {
 			}
 			return fmt.Errorf("start module[%s] failed: %w", mod.Name(), err)
 		}
-		started = append(started, mod)
+		started = append(started, lifeMod)
 	}
 	return nil
 }
@@ -83,7 +92,11 @@ func (m *Manager) CloseAll(ctx context.Context) error {
 	// 逆序遍历
 	for i := len(m.ordered) - 1; i >= 0; i-- {
 		mod := m.ordered[i]
-		if err := mod.Close(ctx); err != nil {
+		lifeMod, ok := mod.(Lifecycle)
+		if !ok {
+			continue
+		}
+		if err := lifeMod.Close(ctx); err != nil {
 			return fmt.Errorf("close module[%s] failed: %w", mod.Name(), err)
 		}
 	}
