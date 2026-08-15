@@ -67,8 +67,16 @@ type Describable interface {
 	Desc() string
 }
 
+type Starter interface {
+	Start(ctx context.Context) error
+}
 
-type Lifecycle interface {
+type Closer interface {
+	Close(ctx context.Context) error
+}
+
+//Runner 启动和关闭
+type Runner interface {
 	//Start 启动
 	// 1. ctx用于启动过程中的阻塞操作, 一次性ctx, 不要存在struct中
 	// 2. NewModule时已经初始过配置
@@ -76,6 +84,10 @@ type Lifecycle interface {
 
 	//Close 关闭
 	Close(ctx context.Context) error
+}
+
+type Lifecycle interface {
+	Runner
 
 	//State 模块状态
 	State() State
