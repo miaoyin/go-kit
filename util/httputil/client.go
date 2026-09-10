@@ -17,13 +17,7 @@ func NewTimeoutClient(timeout time.Duration) *Client {
 //DoRequest 执行请求
 func DoRequest(client *http.Client, method string, url string, options ...Option) *Response {
 	return CreateResponse(func() (*http.Response, error) {
-		opts := NewDefaultOptions()
-		for _, opt := range options {
-			if err := opt(&opts); err != nil {
-				return nil, err
-			}
-		}
-		req, err := opts.CreateRequest(method, url)
+		req, err := NewRequest(method, url, options...)
 		if err!=nil{
 			return nil, err
 		}

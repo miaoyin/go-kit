@@ -1,8 +1,6 @@
 package httputil
 
 import (
-	"bytes"
-	"io"
 	"net/http"
 )
 
@@ -19,13 +17,3 @@ type (
 	// Marshaller 编码
 	Marshaller func(v any) ([]byte, error)
 )
-
-
-// ToReaderE 类型转换
-func ToReaderE(v any, marshaller Marshaller) (io.Reader, error) {
-	rawData, err := marshaller(v)
-	if err!=nil {
-		return nil, err
-	}
-	return bytes.NewBuffer(rawData), nil
-}
