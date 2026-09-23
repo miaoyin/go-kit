@@ -7,13 +7,14 @@ import (
 
 //Lifecycle 异步任务生命周期
 type Lifecycle struct{
+    stopOnce sync.Once
     ctx    context.Context
     cancel context.CancelFunc
     wg     sync.WaitGroup
 }
 
-func NewLifecycle() *Lifecycle {
-    ctx, cancel := context.WithCancel(context.Background())
+func NewLifecycle(parentCtx context.Context) *Lifecycle {
+    ctx, cancel := context.WithCancel(parentCtx)
     return &Lifecycle{
         ctx:    ctx,
         cancel: cancel,
@@ -30,7 +31,13 @@ func (l *Lifecycle) Spawn(fn func(ctx context.Context)) {
 }
 
 func (l *Lifecycle) Stop() {
-    l.cancel()
+    l.stopOnce.Do(func() {
+        l.cancel()
+        l.wg.Wait()
+    })
+}
+
+func (l *Lifecycle) Wait() {
     l.wg.Wait()
 }
 
