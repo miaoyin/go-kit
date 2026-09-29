@@ -40,8 +40,14 @@ func (b *BaseModule[T]) Name() string {
 // 2.configVer版本号, 区分是否更新
 func (b *BaseModule[T]) GetConfig() (*T, int64) {
 	ptr := b.confVal.Load().(*T)
-	//返回副本
 	return ptr, b.confVer.Load()
+}
+
+//Config 读取配置
+// 读取后不要修改, 修改使用SetConfig
+func (b *BaseModule[T]) Config() *T{
+	ptr := b.confVal.Load().(*T)
+	return ptr
 }
 
 //SetConfig 设置配置
