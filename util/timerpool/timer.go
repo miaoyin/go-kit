@@ -1,16 +1,16 @@
-package poolutil
+package timerpool
 
 import (
 	"sync"
 	"time"
 )
 
-//TimerPool timer对象池
+// TimerPool timer对象池
 type TimerPool struct {
 	pool sync.Pool
 }
 
-func NewTimerPool()*TimerPool{
+func NewTimerPool() *TimerPool {
 	return &TimerPool{
 		pool: sync.Pool{
 			New: func() interface{} {
