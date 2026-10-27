@@ -3,6 +3,7 @@ module github.com/miaoyin/go-kit
 go 1.20
 
 require (
+	dario.cat/mergo v1.0.2
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/nats-io/nats.go v1.38.0
