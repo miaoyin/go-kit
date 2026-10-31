@@ -5,8 +5,7 @@ import (
 	"errors"
 )
 
-
-//State 模块状态
+// State 模块状态
 type State uint8
 
 const (
@@ -41,28 +40,28 @@ var (
 	ErrModuleDisabled = errors.New("module disabled by config")
 )
 
-//Named 模块名
-type Named interface{
+// Named 模块名
+type Named interface {
 	//Name 全局唯一标识
 	Name() string
 }
 
-//Dependent 依赖其它模块, 启动先后顺序
+// Dependent 依赖其它模块, 启动先后顺序
 type Dependent interface {
 	Deps() []string
 }
 
-//CanEnable 可开关
+// CanEnable 可开关
 type CanEnable interface {
 	Enabled() bool
 }
 
-//Requirable 必选模块
+// Requirable 必选模块
 type Requirable interface {
 	Required() bool
 }
 
-//Describable 附带描述信息
+// Describable 附带描述信息
 type Describable interface {
 	Desc() string
 }
@@ -75,7 +74,7 @@ type Closer interface {
 	Close(ctx context.Context) error
 }
 
-//Runner 启动和关闭
+// Runner 启动和关闭
 type Runner interface {
 	//Start 启动
 	// 1. ctx用于启动过程中的阻塞操作, 一次性ctx, 不要存在struct中
@@ -96,7 +95,7 @@ type Lifecycle interface {
 	IsRunning() bool
 }
 
-//Configurable 可配置参数模块
+// Configurable 可配置参数模块
 type Configurable[T any] interface {
 	//SetConfig 设置配置,运行时修改. 初始配置在New时传入
 	// 1. Init状态：更新待生效配置
@@ -110,21 +109,19 @@ type Configurable[T any] interface {
 	GetConfig() (*T, int64)
 }
 
-
-//RawModule 通用模块接口
+// RawModule 通用模块接口
 // 用于统一管理
 type RawModule interface {
 	Named
 	Lifecycle
 }
 
-//Module 专用模块管理
+// Module 专用模块管理
 // T是配置参数类型
 // T推荐用struct类型,避免用指针. 配置参数热更新,使用副本更安全
-type Module[T any] interface{
+type Module[T any] interface {
 	//RawModule 通用接口
 	RawModule
 	//Configurable 可配置
 	Configurable[T]
 }
-
