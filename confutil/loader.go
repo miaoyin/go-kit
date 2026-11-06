@@ -13,17 +13,17 @@ import (
 
 // FileLoader 加载文件
 type FileLoader struct {
-	fileSys fs.FS
-	vars    map[string]string
+	fileSys   fs.FS
+	varReader StringReader
 }
 
-func NewFileLoader(fileSys fs.FS, vars map[string]string) *FileLoader {
-	return &FileLoader{fileSys: fileSys, vars: vars}
+func NewFileLoader(fileSys fs.FS, varReader StringReader) *FileLoader {
+	return &FileLoader{fileSys: fileSys, varReader: varReader}
 }
 
 func (l *FileLoader) LoadOne(_ context.Context, filePath string) (map[string]any, error) {
 	// 1.打开文件
-	filePath = Render(filePath, l.vars)
+	filePath = Render(filePath, l.varReader)
 	f, err := l.fileSys.Open(filePath)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (l *FileLoader) LoadOne(_ context.Context, filePath string) (map[string]any
 		return nil, err
 	}
 	raw := buf.Bytes()
-	rawText := Render(string(raw), l.vars)
+	rawText := Render(string(raw), l.varReader)
 
 	// 3.转为map
 	var rawMap map[string]any
