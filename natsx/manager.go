@@ -24,14 +24,14 @@ type OnConnChanged func(nc *nats.Conn)
 // Manager 管理连接
 type Manager struct {
 	*lifecycle.LifeCycler
-	holder    *atomicx.Holder[nats.Conn]
+	holder    *atomicx.PointerHolder[nats.Conn]
 	reloadCh  chan struct{}
 	curConf   atomic.Pointer[NatsConfig]
 	onChanged OnConnChanged
 	runCancel context.CancelFunc
 }
 
-func NewManager(initCfg *NatsConfig, holder *atomicx.Holder[nats.Conn]) *Manager {
+func NewManager(initCfg *NatsConfig, holder *atomicx.PointerHolder[nats.Conn]) *Manager {
 	m := &Manager{
 		holder:   holder,
 		reloadCh: make(chan struct{}, 1),

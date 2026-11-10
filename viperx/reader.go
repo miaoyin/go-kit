@@ -25,10 +25,10 @@ type Updater interface {
 //	2. 直接访问viper, viper.Sub() 会让并发失效, 所以不提供直接接口
 //	3. 下面包装了viper常用接口, 特殊接口使用Read,Write访问
 type ViperReader struct {
-	holder *atomicx.Holder[viper.Viper]
+	holder *atomicx.PointerHolder[viper.Viper]
 }
 
-func NewViperReader(holder *atomicx.Holder[viper.Viper]) *ViperReader {
+func NewViperReader(holder *atomicx.PointerHolder[viper.Viper]) *ViperReader {
 	return &ViperReader{holder: holder}
 }
 

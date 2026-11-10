@@ -21,10 +21,10 @@ type Updater interface {
 }
 
 type NatsClientWrap struct {
-	holder *atomicx.Holder[nats.Conn]
+	holder *atomicx.PointerHolder[nats.Conn]
 }
 
-func NewNatsClientWrap(holder *atomicx.Holder[nats.Conn]) *NatsClientWrap {
+func NewNatsClientWrap(holder *atomicx.PointerHolder[nats.Conn]) *NatsClientWrap {
 	return &NatsClientWrap{holder: holder}
 }
 
