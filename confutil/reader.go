@@ -23,12 +23,12 @@ type Reloader interface {
 }
 
 type configReader struct {
-	raw *atomicx.Holder[viper.Viper]
+	raw *atomicx.PointerHolder[viper.Viper]
 }
 
 // NewConfigReader 返回两个接口
 // 使用者不要看到Reloader接口
-func NewConfigReader(raw *atomicx.Holder[viper.Viper]) ConfigReader {
+func NewConfigReader(raw *atomicx.PointerHolder[viper.Viper]) ConfigReader {
 	return &configReader{raw: raw}
 }
 
@@ -77,7 +77,7 @@ func (d *configReader) Sub(prefix string) ConfigReader {
 	if subVP == nil {
 		subVP = viper.New()
 	}
-	return NewConfigReader(atomicx.NewHolder(subVP))
+	return NewConfigReader(atomicx.NewPointerHolder(subVP))
 }
 
 func (d *configReader) IsSet(key string) bool {
